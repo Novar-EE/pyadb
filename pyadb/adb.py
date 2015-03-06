@@ -34,7 +34,7 @@ class ADB():
     def pyadb_version(self):
         return self.PYADB_VERSION
 
-    def __init__(self,adb_path=None):
+    def __init__(self,adb_path='adb'):
         self.__adb_path = adb_path
 
     def __clean__(self):
@@ -62,16 +62,15 @@ class ADB():
         # converted to a string on the windows 7 test systems.  To accomodate, this block explitely
         # detects windows vs. non-windows and builds the OS dependent command output
         #
-        if sys.platform.startswith('win'):
-            if( self.__target is None ):
-                ret = self.__adb_path + " " + cmd
-            else:
-                ret = self.__adb_path + " -s " + self.__target + " " + cmd
+        if( self.__target is None ):
+            ret = self.__adb_path + " " + cmd
         else:
-            if( self.__target is None ):
-                ret = [self.__adb_path , cmd]
-            else:
-                ret = [self.__adb_path, "-s", self.__target, cmd]
+            ret = self.__adb_path + " -s " + self.__target + " " + cmd
+
+        if sys.platform.startswith('win'):
+            pass
+        else:
+            ret = ret.split(" ")
 
         return ret
     
@@ -101,6 +100,7 @@ class ADB():
         
         # For compat of windows
         cmd_list = self.__build_command__(cmd)
+#        print cmd_list
 
         try:
             (self.__output, self.__error) = subprocess.Popen(cmd_list, stdin = subprocess.PIPE, \
